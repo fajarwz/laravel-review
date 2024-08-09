@@ -1,0 +1,56 @@
+{
+    "name": "fajarwz/laravel-review",
+    "description": "A package to add reviews for Laravel applications",
+    "keywords": [
+        "fajarwz",
+        "laravel",
+        "laravel-review",
+        "review",
+        "rating"
+    ],
+    "homepage": "https://github.com/fajarwz/laravel-review",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "fajarwz",
+            "email": "hi@fajarwz.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.2"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": {
+            "Fajarwz\\LaravelReview\\": "src/",
+            "Fajarwz\\LaravelReview\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Fajarwz\\LaravelReview\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Fajarwz\\LaravelReview\\LaravelReviewServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
