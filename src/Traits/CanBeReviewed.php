@@ -4,8 +4,8 @@ namespace Fajarwz\LaravelReview\Traits;
 
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Fajarwz\LaravelReview\Review;
-use Fajarwz\LaravelReview\ReviewSummary;
+use Fajarwz\LaravelReview\Models\Review;
+use Fajarwz\LaravelReview\Models\ReviewSummary;
 
 trait CanBeReviewed
 {

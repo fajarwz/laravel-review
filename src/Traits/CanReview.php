@@ -3,7 +3,7 @@
 namespace Fajarwz\LaravelReview\Traits;
 
 use Fajarwz\LaravelReview\Exceptions\DuplicateReviewException;
-use Fajarwz\LaravelReview\Review;
+use Fajarwz\LaravelReview\Models\Review;
 use DB;
 use Fajarwz\LaravelReview\Exceptions\ReviewNotFoundException;
 
@@ -48,7 +48,7 @@ trait CanReview
      * @param  float    $rating
      * @param  string   $reviewContent
      * @param  bool     $isApproved
-     * @return \Fajarwz\LaravelReview\Review
+     * @return \Fajarwz\LaravelReview\Models\Review
      */
     public function review($model, float $rating, string $reviewContent = null, bool $isApproved = true): Review
     {
@@ -75,7 +75,7 @@ trait CanReview
      * @param  float    $newRating
      * @param  string   $newReview
      * @param  bool     $isApproved
-     * @return \Fajarwz\LaravelReview\Review
+     * @return \Fajarwz\LaravelReview\Models\Review
      */
     public function updateReview($model, float $newRating, string $newReview = null, bool $isApproved = true): Review
     {
@@ -116,7 +116,7 @@ trait CanReview
      * Save a review and update the summary.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return \Fajarwz\LaravelReview\Review
+     * @return \Fajarwz\LaravelReview\Models\Review
      */
     public function saveReview(array $data): Review
     {
@@ -130,8 +130,10 @@ trait CanReview
             $review->fill($data);
             $review->save();
     
-            $reviewable = $review->reviewable;
-            $reviewable->incrementReviewSummary($data['rating']);
+            if ($data['approved_at']) {
+                $reviewable = $review->reviewable;
+                $reviewable->incrementReviewSummary($data['rating']);
+            }
     
             return $review;
         });
