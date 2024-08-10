@@ -3,8 +3,10 @@
 namespace Fajarwz\LaravelReview\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Scope;
 
-class ApprovedReviewsScope
+class ApprovedReviewsScope implements Scope
 {
     /**
      * Applies a scope to only include approved reviews.
@@ -14,7 +16,7 @@ class ApprovedReviewsScope
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function apply(Builder $builder): void
+    public function apply(Builder $builder, Model $model): void
     {
         $builder->whereNotNull('approved_at');
     }

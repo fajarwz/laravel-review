@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->morphs('reviewer');
             $table->morphs('reviewable');
-            $table->float('rating', 9, 2);
+            $table->decimal('rating', 9, 2)->default(0);
             $table->text('content')->nullable();
             $table->timestamp('approved_at')->nullable();
             $table->timestamps();

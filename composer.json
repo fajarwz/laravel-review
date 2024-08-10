@@ -20,12 +20,9 @@
     "require": {
         "php": "^8.2"
     },
-    "require-dev": {
-    },
     "autoload": {
         "psr-4": {
-            "Fajarwz\\LaravelReview\\": "src/",
-            "Fajarwz\\LaravelReview\\Database\\Factories\\": "database/factories/"
+            "Fajarwz\\LaravelReview\\": "src/"
         }
     },
     "autoload-dev": {
@@ -52,5 +49,8 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "require-dev": {
+        "orchestra/testbench": "^9.2"
+    }
 }

@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('review_summaries', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->morphs('reviewable');
-            $table->decimal('average_rating', 9, 2)->default(0);
-            $table->bigInteger('review_count')->unsigned()->default(0);
-            $table->timestamps();
+            $table->string('email');
         });
     }
 
@@ -25,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('review_summaries');
+        Schema::dropIfExists('users');
     }
 };

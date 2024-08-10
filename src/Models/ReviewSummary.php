@@ -1,6 +1,6 @@
 <?php
 
-namespace Fajarwz\LaravelReview;
+namespace Fajarwz\LaravelReview\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
