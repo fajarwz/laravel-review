@@ -31,7 +31,7 @@ Include the necessary traits in your models:
 For models that can be reviewed, use the `CanBeReviewed` trait:
 
 ```php
-use Fajarwz\LaravelReview\CanBeReviewed;
+use Fajarwz\LaravelReview\Traits\CanBeReviewed;
 
 class Mentor extends Model
 {
@@ -45,7 +45,7 @@ class Mentor extends Model
 For models that can submit reviews, use the `CanReview` trait:
 
 ```php
-use Fajarwz\LaravelReview\CanReview;
+use Fajarwz\LaravelReview\Traits\CanReview;
 
 class Mentee extends Model
 {

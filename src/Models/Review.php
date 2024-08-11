@@ -69,6 +69,8 @@ class Review extends Model
             /** @phpstan-ignore-next-line */
             $this->reviewable->updateReviewSummary($params);
         });
+
+        return true;
     }
 
     /**
@@ -93,6 +95,8 @@ class Review extends Model
             /** @phpstan-ignore-next-line */
             $this->reviewable->updateReviewSummary($params);
         });
+
+        return true;
     }
 
     /**
