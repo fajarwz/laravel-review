@@ -1,11 +1,11 @@
-# laravel-review, effortlessly add reviews to any Laravel model.
+# Laravel Review
 
-<!-- [![Latest Version on Packagist](https://img.shields.io/packagist/v/fajarwz/laravel-review.svg?style=flat-square)](https://packagist.org/packages/fajarwz/laravel-review) -->
-<!-- [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/fajarwz/laravel-review/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/fajarwz/laravel-review/actions?query=workflow%3Arun-tests+branch%3Amain) -->
-<!-- [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/fajarwz/laravel-review/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/fajarwz/laravel-review/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain) -->
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/fajarwz/laravel-review.svg?style=flat-square)](https://packagist.org/packages/fajarwz/laravel-review)
+[![GitHub Tests Action Status](https://github.com/fajarwz/laravel-review/actions/workflows/run-tests.yml/badge.svg)](https://github.com/fajarwz/laravel-review/actions/workflows/run-tests.yml)
+[![GitHub Code Style Action Status](https://github.com/fajarwz/laravel-review/actions/workflows/fix-php-code-style-issues.yml/badge.svg)](https://github.com/fajarwz/laravel-review/actions/workflows/fix-php-code-style-issues.yml)
 <!-- [![Total Downloads](https://img.shields.io/packagist/dt/fajarwz/laravel-review.svg?style=flat-square)](https://packagist.org/packages/fajarwz/laravel-review) -->
 
-Flexible and powerful review system for Laravel, let any model review and be reviewed.
+Effortlessly add review functionality to any Laravel model with this flexible and powerful review system.
 
 ## Installation
 
@@ -24,21 +24,29 @@ php artisan migrate
 
 ## Setup
 
-Include the necessary traits:
+### Models Setup
+Include the necessary traits in your models:
+
+#### Reviewed/Reviewable Model
+For models that can be reviewed, use the `CanBeReviewed` trait:
 
 ```php
 use Fajarwz\LaravelReview\CanBeReviewed;
-use Fajarwz\LaravelReview\CanReview;
 
-// Reviewed/Reviewable model
 class Mentor extends Model
 {
     use CanBeReviewed;
-    // You can also make a reviewable model a reviewer and vice versa
+    // Optionally, use CanReview if the model can also act as a reviewer
     // use CanReview;
 }
+```
 
-// Reviewer model
+#### Reviewer Model
+For models that can submit reviews, use the `CanReview` trait:
+
+```php
+use Fajarwz\LaravelReview\CanReview;
+
 class Mentee extends Model
 {
     use CanReview;
@@ -49,18 +57,20 @@ class Mentee extends Model
 
 ### Creating a Review
 
+To create a new review:
+
 ```php
 $mentee = Mentee::find(1);
 $mentor = Mentor::find(1);
 
-// Create a new approved review
+// Create an approved review
 $mentee->review($mentor, 4.5, 'Great mentor!');
 
-// Create a new unapproved review (requires approval)
+// Create an unapproved review
 $mentee->review($mentor, 3.0, 'Needs improvement', false);
 ```
 
-The review method takes three required parameters: the reviewable model, the rating, and the review content. An optional fourth parameter, `$isApproved`, can be set to false to create an unapproved review.
+The `review()` method requires the reviewable model, rating, and review content. Optionally, set the `$isApproved` parameter to `false` to create an unapproved review.
 
 Only approved reviews are calculated in the `review_summaries` table. Updating an unapproved review will not affect the summary.
 
@@ -69,6 +79,8 @@ If the reviewer model has already submitted a review for the same reviewable mod
 To update a review, use `updateReview()` instead.
 
 ### Updating a review
+
+To update an existing review:
 
 ```php
 $mentee->updateReview($mentor, 5, 'Mentor is even better now!');
@@ -84,37 +96,41 @@ $mentee->unreview($mentor);
 
 If the reviewer model has not previously reviewed the model, a `Fajarwz\LaravelReview\Exceptions\ReviewNotFoundException` will be thrown.
 
-### Approve a review
+### Approving a Review
+
+To approve a review:
 
 ```php
 $review = $mentor->receivedReviews()->first();
-
 $review->approve();
 ```
 
-### Unapprove a review
+### Unapproving a Review
+
+To unapprove a review:
 
 ```php
 $review = $mentor->receivedReviews()->first();
-
 $review->unapprove();
 ```
 
-### Get all received reviews
+### Querying Reviews
 
-By default, only approved reviews are retrieved.
+#### Get all received reviews
+
+By default, only approved reviews are retrieved:
 
 ```php
 $mentor->receivedReviews()->get();
 ```
 
-To retrieve all reviews, including unapproved ones, use the `withUnapproved()`:
+To include both approved and unapproved reviews:
 
 ```php
 $mentor->receivedReviews()->withUnapproved()->get();
 ```
 
-To include the reviewer information:
+To include reviewer information:
 
 ```php
 Mentor::with('receivedReviews.reviewer')->paginate();
@@ -124,7 +140,7 @@ This query will eager load the reviewer information for each received review.
 
 **Note:** Consider using appropriate eager loading strategies based on your application's needs to optimize query performance.
 
-### Get all given reviews
+#### Get all given reviews
 
 To get all reviews given by a model:
 
@@ -132,7 +148,7 @@ To get all reviews given by a model:
 $mentee->givenReviews()->get();
 ```
 
-To include the reviewable model information for each review:
+To include reviewable model information:
 
 ```php
 Mentee::with('givenReviews.reviewable')->paginate();
@@ -140,45 +156,106 @@ Mentee::with('givenReviews.reviewable')->paginate();
 
 This will eager load the reviewable model for each review given by the model.
 
-### Checking if a reviewer model has given a review for the specified model
+### Review Model
+
+The `Fajarwz\LaravelReview\Models\Review` model includes methods for managing and querying reviews:
+
+#### Approve a Review
+
+To approve a review, use the `approve()` method. This sets the `approved_at` timestamp to the current date and time, indicating that the review has been approved. It also updates the review summary of the associated model.
 
 ```php
-if ($mentee->hasGivenReview($mentor)) {
-    // Mentee has reviewed the mentor
+use Fajarwz\LaravelReview\Models\Review;
+
+$review = Review::find($id);
+$review->approve();
+```
+
+#### Unapprove a Review
+
+To unapprove a review, use the `unapprove()` method. This sets the `approved_at` timestamp to null, indicating that the review is no longer approved. It also updates the review summary of the associated model to decrement the rating count if necessary.
+
+```php
+$review = Review::find($id);
+$review->unapprove();
+```
+
+#### Check If a Review Is Approved
+
+To check if a review is approved, use the `isApproved()` method. This method returns true if the `approved_at` timestamp is not null, and false otherwise.
+
+```php
+$review = Review::find($id);
+if ($review->isApproved()) {
+    // The review is approved
 }
 ```
 
-### Checking if a revieweable model has received a review from the specified model
+#### Query Approved Reviews
+
+By default, the Review model applies a global scope to only include approved reviews. To query only approved reviews, you can use the model's standard query methods:
 
 ```php
-if ($mentor->hasReceivedReview($mentee)) {
-    // Mentor has received a review from the mentee
-}
+$approvedReviews = Review::all();
 ```
 
-### Checking if a review has been approved
+#### Query Unapproved Reviews
+
+To include unapproved reviews in your query, use the `withUnapproved()` method. This removes the global scope that filters out unapproved reviews, allowing you to query both approved and unapproved reviews.
 
 ```php
-$review->isApproved()
+$allReviews = Review::withUnapproved()->get();
 ```
 
-### Accessing review summary of a reviewed model
+#### Get the Reviewer
+
+To get the model that reviewed the item, use the `reviewer()` method. This method returns a polymorphic relationship to the reviewer model.
 
 ```php
-// Access review summary properties
-$mentor->reviewSummary;
+$review = Review::find($id);
+$reviewer = $review->reviewer;
+```
 
-// Access the average rating
-$mentor->reviewSummary->average_rating;
+#### Get the Reviewable Model
 
-// Access the review count
-$mentor->reviewSummary->review_count;
+To get the model that was reviewed, use the `reviewable()` method. This method returns a polymorphic relationship to the reviewed model.
+
+```php
+$review = Review::find($id);
+$reviewable = $review->reviewable;
+```
+
+### ReviewSummary Model
+
+The `Fajarwz\LaravelReview\Models\ReviewSummary` model represents a summary of reviews for a specific reviewable model.
+
+#### Attributes
+
+- `average_rating`: The average rating of all reviews for the reviewable model.
+- `review_count`: The total number of reviews for the reviewable model.
+
+#### Get the Reviewable Model
+
+The `reviewable()` method defines a polymorphic relationship to the model that is being reviewed. It allows you to access the model that this review summary belongs to.
+
+```php
+use Fajarwz\LaravelReview\Models\ReviewSummary;
+
+$reviewSummary = ReviewSummary::find($id);
+$reviewable = $reviewSummary->reviewable;
 ```
 
 ## Testing
 
 ```bash
+# Use PHPStan to perform static analysis
+composer analyse
+
+# Execute PHPUnit tests
 composer test
+
+# Use Pint to format your code
+composer format
 ```
 
 ## Changelog
@@ -187,7 +264,7 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 
 ## Contributing
 
-We welcome contributions to improve this package by opening [issues](https://github.com/fajarwz/laravel-review/issues) or [pull requests](https://github.com/fajarwz/laravel-review/pulls) and clearly describe your changes.
+We welcome contributions. Please open [issues](https://github.com/fajarwz/laravel-review/issues) or [pull requests](https://github.com/fajarwz/laravel-review/pulls) with your suggestions or improvements.
 
 ## Getting Help
 

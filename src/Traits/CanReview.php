@@ -116,7 +116,7 @@ trait CanReview
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      */
-    public function saveReview(array $data, bool $isUpdate = false): Review
+    protected function saveReview(array $data, bool $isUpdate = false): Review
     {
         return DB::transaction(function () use ($data, $isUpdate) {
             $review = Review::where('reviewer_id', $data['reviewer_id'])
