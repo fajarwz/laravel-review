@@ -67,7 +67,7 @@ trait CanBeReviewed
         $isUpdate = $params['isUpdate'] ?? false;
         $decrement = $params['decrement'] ?? false;
 
-        $summary = $this->reviewSummary()->firstOrCreate();
+        $summary = $this->reviewSummary()->firstOrCreate([]);
 
         if ($decrement) {
             $summary = $this->decrementReview($summary, $rating);
