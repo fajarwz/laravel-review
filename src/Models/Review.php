@@ -52,8 +52,6 @@ class Review extends Model
      * Approves a review.
      *
      * Sets the `approved_at` timestamp to indicate approval and updates the review summary.
-     * 
-     * @return void
      */
     public function approve(): void
     {
@@ -77,8 +75,6 @@ class Review extends Model
      * Unapproves a review.
      *
      * Sets the `approved_at` timestamp to null and updates the review summary.
-     * 
-     * @return void
      */
     public function unapprove(): void
     {
