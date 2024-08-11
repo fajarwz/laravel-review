@@ -5,7 +5,7 @@
 [![GitHub Code Style Action Status](https://github.com/fajarwz/laravel-review/actions/workflows/fix-php-code-style-issues.yml/badge.svg)](https://github.com/fajarwz/laravel-review/actions/workflows/fix-php-code-style-issues.yml)
 <!-- [![Total Downloads](https://img.shields.io/packagist/dt/fajarwz/laravel-review.svg?style=flat-square)](https://packagist.org/packages/fajarwz/laravel-review) -->
 
-Effortlessly add review functionality to any Laravel model with this flexible and powerful review system.
+![](https://banners.beyondco.de/Laravel%20Review.png?theme=light&packageManager=composer+require&packageName=fajarwz%2Flaravel-review&pattern=architect&style=style_2&description=Flexible+and+powerful+review+system+for+Laravel%2C+let+any+model+review+and+be+reviewed.&md=1&showWatermark=0&fontSize=100px&images=https%3A%2F%2Flaravel.com%2Fimg%2Flogomark.min.svg)
 
 ## Installation
 
