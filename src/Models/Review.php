@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @property \Illuminate\Support\Carbon|null $approved_at
+ * @property float $rating
+ */
 class Review extends Model
 {
     protected $fillable = [
@@ -48,6 +52,8 @@ class Review extends Model
      * Approves a review.
      *
      * Sets the `approved_at` timestamp to indicate approval and updates the review summary.
+     * 
+     * @return void
      */
     public function approve(): void
     {
@@ -62,6 +68,7 @@ class Review extends Model
             $params = [
                 'rating' => $this->rating,
             ];
+            /** @phpstan-ignore-next-line */
             $this->reviewable->updateReviewSummary($params);
         });
     }
@@ -70,6 +77,8 @@ class Review extends Model
      * Unapproves a review.
      *
      * Sets the `approved_at` timestamp to null and updates the review summary.
+     * 
+     * @return void
      */
     public function unapprove(): void
     {
@@ -85,15 +94,26 @@ class Review extends Model
                 'rating' => $this->rating,
                 'decrement' => true,
             ];
+            /** @phpstan-ignore-next-line */
             $this->reviewable->updateReviewSummary($params);
         });
     }
 
+    /**
+     * Get the owning reviewer model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     */
     public function reviewer()
     {
         return $this->morphTo();
     }
 
+    /**
+     * Get the owning reviewable model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     */
     public function reviewable()
     {
         return $this->morphTo();

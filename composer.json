@@ -28,6 +28,7 @@
         }
     },
     "scripts": {
+        "analyse": "vendor/bin/phpstan analyse",
         "test": "vendor/bin/phpunit",
         "test-coverage": "vendor/bin/phpunit --coverage",
         "format": "vendor/bin/pint"
@@ -49,6 +50,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require-dev": {
+        "larastan/larastan": "^2.0",
         "laravel/pint": "^1.17",
         "orchestra/testbench": "^9.2"
     }
