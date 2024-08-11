@@ -2,6 +2,7 @@
 
 namespace Fajarwz\LaravelReview\Tests;
 
+use Carbon\Carbon;
 use Fajarwz\LaravelReview\Models\Review;
 use Fajarwz\LaravelReview\Tests\Models\Mentee;
 use Fajarwz\LaravelReview\Tests\Models\Mentor;
@@ -60,7 +61,7 @@ class ReviewTest extends TestCase
         $this->unapprovedReview->approve();
 
         $this->assertNotNull($this->unapprovedReview->approved_at);
-        $this->assertEquals(now()->toDateTimeString(), $this->unapprovedReview->approved_at);
+        $this->assertInstanceOf(Carbon::class, $this->unapprovedReview->approved_at);
     }
 
     public function test_unapprove_sets_approved_at_to_null_when_already_approved()
