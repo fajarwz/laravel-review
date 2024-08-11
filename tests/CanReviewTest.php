@@ -59,14 +59,15 @@ class CanReviewTest extends TestCase
         $this->assertCount(1, $reviews);
     }
 
-    public function test_hasReviewed_returns_true_if_a_reviewer_has_reviewed_the_given_model()
+    public function test_hasGivenReview_returns_true_if_a_reviewer_has_reviewed_the_given_model()
     {
-        $this->assertTrue($this->mentee->hasReviewed($this->mentor));
+        $this->assertTrue($this->mentee->hasGivenReview($this->mentor));
     }
 
-    public function test_hasReviewed_returns_false_if_a_reviewer_has_not_reviewed_the_given_model()
+    public function test_hasGivenReview_returns_false_if_a_reviewer_has_not_reviewed_the_given_model()
     {
-        $this->assertFalse($this->mentee->hasReviewed($this->mentee));
+        $otherMentor = Mentor::factory()->create();
+        $this->assertFalse($this->mentee->hasGivenReview($otherMentor));
     }
 
     public function test_a_reviewer_can_review_the_given_model()

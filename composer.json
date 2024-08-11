@@ -1,6 +1,6 @@
 {
     "name": "fajarwz/laravel-review",
-    "description": "A package to add reviews for Laravel applications",
+    "description": "Flexible and powerful review system for Laravel, let any model review and be reviewed.",
     "keywords": [
         "fajarwz",
         "laravel",
@@ -17,9 +17,6 @@
             "role": "Developer"
         }
     ],
-    "require": {
-        "php": "^8.2"
-    },
     "autoload": {
         "psr-4": {
             "Fajarwz\\LaravelReview\\": "src/"

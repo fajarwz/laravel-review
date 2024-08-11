@@ -31,6 +31,20 @@ trait CanBeReviewed
     }
 
     /**
+     * Check if the current model has received a review from the specified model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return bool
+     */
+    public function hasReceivedReview(Model $model): bool
+    {
+        return $this->receivedReviews()
+            ->where('reviewer_type', get_class($model))
+            ->where('reviewer_id', $model->getKey())
+            ->exists();
+    }
+
+    /**
      * Returns the review summary for this model.
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne

@@ -140,11 +140,19 @@ Mentee::with('givenReviews.reviewable')->paginate();
 
 This will eager load the reviewable model for each review given by the model.
 
-### Checking if a reviewer model has reviewed a model
+### Checking if a reviewer model has given a review for the specified model
 
 ```php
-if ($mentee->hasReviewed($mentor)) {
+if ($mentee->hasGivenReview($mentor)) {
     // Mentee has reviewed the mentor
+}
+```
+
+### Checking if a reviewer model has received a review from the specified model
+
+```php
+if ($mentor->hasReceivedReview($mentee)) {
+    // Mentor has received a review from the mentee
 }
 ```
 

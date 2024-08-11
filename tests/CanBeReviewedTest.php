@@ -57,6 +57,17 @@ class CanBeReviewedTest extends TestCase
         $this->assertCount(1, $reviews);
     }
 
+    public function test_hasReceivedReview_returns_true_if_a_reviewable_has_been_reviewed_by_the_given_model()
+    {
+        $this->assertTrue($this->mentor->hasReceivedReview($this->mentee));
+    }
+
+    public function test_hasReceivedReview_returns_false_if_a_reviewable_has_not_been_reviewed_by_the_given_model()
+    {
+        $otherMentee = Mentee::factory()->create();
+        $this->assertFalse($this->mentor->hasReceivedReview($otherMentee));
+    }
+
     public function test_a_reviewable_can_display_its_review_summary()
     {
         $this->assertTrue($this->mentor->reviewSummary->exists());

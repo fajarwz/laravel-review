@@ -32,12 +32,12 @@ trait CanReview
     }
 
     /**
-     * Check if the current model is rating another model.
+     * Check if the current model has given a review for the specified model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return bool
      */
-    public function hasReviewed($model): bool
+    public function hasGivenReview($model): bool
     {
         return $this->givenReviews()
             ->where('reviewable_type', get_class($model))
@@ -56,7 +56,7 @@ trait CanReview
      */
     public function review($model, float $rating, string $reviewContent = null, bool $isApproved = true): Review
     {
-        if ($this->hasReviewed($model)) {
+        if ($this->hasGivenReview($model)) {
             throw new DuplicateReviewException;
         }
 
@@ -103,7 +103,7 @@ trait CanReview
      */
     public function unreview($model): bool
     {
-        if (!$this->hasReviewed($model)) {
+        if (!$this->hasGivenReview($model)) {
             throw new ReviewNotFoundException;
         }
 
