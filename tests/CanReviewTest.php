@@ -2,12 +2,12 @@
 
 namespace Fajarwz\LaravelReview\Tests;
 
-use Fajarwz\LaravelReview\Exceptions\DuplicateReviewException;
-use Fajarwz\LaravelReview\Models\ReviewSummary;
-use Fajarwz\LaravelReview\Tests\Models\Mentor;
-use Fajarwz\LaravelReview\Tests\Models\Mentee;
 use DB;
+use Fajarwz\LaravelReview\Exceptions\DuplicateReviewException;
 use Fajarwz\LaravelReview\Exceptions\ReviewNotFoundException;
+use Fajarwz\LaravelReview\Models\ReviewSummary;
+use Fajarwz\LaravelReview\Tests\Models\Mentee;
+use Fajarwz\LaravelReview\Tests\Models\Mentor;
 
 class CanReviewTest extends TestCase
 {
@@ -107,7 +107,7 @@ class CanReviewTest extends TestCase
 
         $this->assertEquals($this->mentee->givenReviews(new Mentor)->whereReviewableId($mentor->id)->first()->rating, $newRating);
     }
-    
+
     public function test_a_review_summary_for_the_reviewable_model_updated_after_update_review()
     {
         $reviewSummary = ReviewSummary::where([

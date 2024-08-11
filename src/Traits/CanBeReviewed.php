@@ -2,21 +2,20 @@
 
 namespace Fajarwz\LaravelReview\Traits;
 
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Fajarwz\LaravelReview\Models\Review;
 use Fajarwz\LaravelReview\Models\ReviewSummary;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 trait CanBeReviewed
 {
     /**
      * Returns a collection of reviews received by this model.
-     * 
+     *
      * This method allows filtering reviews by a specific reviewer.
-     * 
+     *
      * @param  \Illuminate\Database\Eloquent\Model|null  $model  The reviewer model to filter reviews by (optional)
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function receivedReviews(?Model $model = null): HasMany
     {
@@ -32,9 +31,6 @@ trait CanBeReviewed
 
     /**
      * Check if the current model has received a review from the specified model.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return bool
      */
     public function hasReceivedReview(Model $model): bool
     {
@@ -46,8 +42,6 @@ trait CanBeReviewed
 
     /**
      * Returns the review summary for this model.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
     public function reviewSummary(): MorphOne
     {
@@ -57,8 +51,7 @@ trait CanBeReviewed
     /**
      * Increment the review summary for this model.
      *
-     * @param array $params The parameters needed.
-     * @return void
+     * @param  array  $params  The parameters needed.
      */
     public function updateReviewSummary(array $params): void
     {
@@ -88,11 +81,10 @@ trait CanBeReviewed
             $summary->review_count -= 1;
             $totalRating = $summary->average_rating * ($summary->review_count + 1);
             $summary->average_rating = $this->calculateAverageRating(
-                $totalRating - $rating, 
+                $totalRating - $rating,
                 $summary->review_count
             );
-        }
-        else {
+        } else {
             $summary->review_count = 0;
             $summary->average_rating = 0.0;
         }
@@ -103,7 +95,7 @@ trait CanBeReviewed
     protected function updateExistingReview(ReviewSummary $summary, float $rating, float $oldRating): ReviewSummary
     {
         $summary->average_rating = $this->calculateAverageRating(
-            ($summary->average_rating * $summary->review_count - $oldRating + $rating), 
+            ($summary->average_rating * $summary->review_count - $oldRating + $rating),
             $summary->review_count
         );
 
@@ -114,7 +106,7 @@ trait CanBeReviewed
     {
         $summary->review_count += 1;
         $summary->average_rating = $this->calculateAverageRating(
-            ($summary->average_rating * ($summary->review_count - 1) + $rating), 
+            ($summary->average_rating * ($summary->review_count - 1) + $rating),
             $summary->review_count
         );
 
@@ -126,7 +118,7 @@ trait CanBeReviewed
         if ($reviewCount <= 0) {
             return 0.0;
         }
-    
+
         return number_format($totalRating / $reviewCount, 2);
     }
 }

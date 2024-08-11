@@ -9,6 +9,7 @@ use Fajarwz\LaravelReview\Tests\Models\Mentor;
 class ReviewTest extends TestCase
 {
     protected $approvedReview;
+
     protected $unapprovedReview;
 
     protected function setUp(): void

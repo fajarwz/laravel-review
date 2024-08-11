@@ -3,22 +3,23 @@
 namespace Fajarwz\LaravelReview\Tests;
 
 use Fajarwz\LaravelReview\LaravelReviewServiceProvider;
-use Fajarwz\LaravelReview\Tests\Models\Mentor;
 use Fajarwz\LaravelReview\Tests\Models\Mentee;
+use Fajarwz\LaravelReview\Tests\Models\Mentor;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $mentor;
+
     protected $mentee;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->loadMigrationsFrom(__DIR__ .DIRECTORY_SEPARATOR.'Database'.DIRECTORY_SEPARATOR .'Migrations',);
+        $this->loadMigrationsFrom(__DIR__.DIRECTORY_SEPARATOR.'Database'.DIRECTORY_SEPARATOR.'Migrations');
         $this->artisan('migrate', ['--database' => 'testbench'])->run();
 
-        $this->loadMigrationsFrom(__DIR__ .DIRECTORY_SEPARATOR .'..'.DIRECTORY_SEPARATOR .'database'.DIRECTORY_SEPARATOR .'migrations');
+        $this->loadMigrationsFrom(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'database'.DIRECTORY_SEPARATOR.'migrations');
         $this->artisan('migrate', ['--database' => 'testbench'])->run();
 
         $this->mentor = Mentor::factory()->create();
@@ -36,9 +37,9 @@ class TestCase extends \Orchestra\Testbench\TestCase
     {
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => '',
+            'prefix' => '',
         ]);
     }
 }

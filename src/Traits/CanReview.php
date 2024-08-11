@@ -2,10 +2,10 @@
 
 namespace Fajarwz\LaravelReview\Traits;
 
-use Fajarwz\LaravelReview\Exceptions\DuplicateReviewException;
-use Fajarwz\LaravelReview\Models\Review;
 use DB;
+use Fajarwz\LaravelReview\Exceptions\DuplicateReviewException;
 use Fajarwz\LaravelReview\Exceptions\ReviewNotFoundException;
+use Fajarwz\LaravelReview\Models\Review;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -13,11 +13,10 @@ trait CanReview
 {
     /**
      * Returns a collection of reviews given by this model.
-     * 
+     *
      * This method allows filtering reviews by a specific model.
-     * 
+     *
      * @param  \Illuminate\Database\Eloquent\Model|null  $model  The model to filter reviews by (optional)
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function givenReviews(?Model $model = null): HasMany
     {
@@ -35,7 +34,6 @@ trait CanReview
      * Check if the current model has given a review for the specified model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return bool
      */
     public function hasGivenReview($model): bool
     {
@@ -49,12 +47,8 @@ trait CanReview
      * Review a certain model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  float    $rating
-     * @param  string   $reviewContent
-     * @param  bool     $isApproved
-     * @return \Fajarwz\LaravelReview\Models\Review
      */
-    public function review($model, float $rating, string $reviewContent = null, bool $isApproved = true): Review
+    public function review($model, float $rating, ?string $reviewContent = null, bool $isApproved = true): Review
     {
         if ($this->hasGivenReview($model)) {
             throw new DuplicateReviewException;
@@ -69,6 +63,7 @@ trait CanReview
             'content' => $reviewContent,
             'approved_at' => $isApproved ? now() : null,
         ];
+
         return $this->saveReview($data);
     }
 
@@ -76,12 +71,8 @@ trait CanReview
      * Update the review for a model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  float    $newRating
-     * @param  string   $newReview
-     * @param  bool     $isApproved
-     * @return \Fajarwz\LaravelReview\Models\Review
      */
-    public function updateReview($model, float $newRating, string $newReview = null, bool $isApproved = true): Review
+    public function updateReview($model, float $newRating, ?string $newReview = null, bool $isApproved = true): Review
     {
         $data = [
             'reviewer_id' => $this->id,
@@ -92,6 +83,7 @@ trait CanReview
             'content' => $newReview,
             'approved_at' => $isApproved ? now() : null,
         ];
+
         return $this->saveReview($data, true);
     }
 
@@ -99,11 +91,10 @@ trait CanReview
      * Unreview a certain model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return bool
      */
     public function unreview($model): bool
     {
-        if (!$this->hasGivenReview($model)) {
+        if (! $this->hasGivenReview($model)) {
             throw new ReviewNotFoundException;
         }
 
@@ -124,8 +115,6 @@ trait CanReview
      * Save a review and update the summary.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  bool                                 $isUpdate
-     * @return \Fajarwz\LaravelReview\Models\Review
      */
     public function saveReview(array $data, bool $isUpdate = false): Review
     {
@@ -140,10 +129,10 @@ trait CanReview
             if ($isUpdate) {
                 $oldRating = $review->rating;
             }
-    
+
             $review->fill($data);
             $review->save();
-    
+
             if ($data['approved_at']) {
                 $params = [
                     'rating' => $data['rating'],
@@ -152,7 +141,7 @@ trait CanReview
                 ];
                 $review->reviewable->updateReviewSummary($params);
             }
-    
+
             return $review;
         });
     }

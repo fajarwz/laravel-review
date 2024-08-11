@@ -26,9 +26,6 @@ class Review extends Model
 
     /**
      * Scope a query to include unapproved reviews.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return void
      */
     public function scopeWithUnapproved(Builder $query): void
     {
@@ -49,10 +46,8 @@ class Review extends Model
 
     /**
      * Approves a review.
-     * 
+     *
      * Sets the `approved_at` timestamp to indicate approval and updates the review summary.
-     * 
-     * @return void
      */
     public function approve(): void
     {
@@ -73,14 +68,12 @@ class Review extends Model
 
     /**
      * Unapproves a review.
-     * 
+     *
      * Sets the `approved_at` timestamp to null and updates the review summary.
-     * 
-     * @return void
      */
     public function unapprove(): void
     {
-        if (!$this->isApproved()) {
+        if (! $this->isApproved()) {
             return;
         }
 

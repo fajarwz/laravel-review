@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Mentor extends Model
 {
+    use CanBeReviewed, CanReview;
     use HasPackageFactory;
-    use CanReview, CanBeReviewed;
 
     public $timestamps = false;
 

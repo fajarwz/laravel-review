@@ -12,7 +12,7 @@ trait HasPackageFactory
     protected static function newFactory()
     {
         $modelName = Str::after(get_called_class(), 'Models\\');
-        $path = DIRECTORY_SEPARATOR .'Fajarwz'.DIRECTORY_SEPARATOR .'LaravelReview'.DIRECTORY_SEPARATOR .'Tests'.DIRECTORY_SEPARATOR .'Database'.DIRECTORY_SEPARATOR.'Factories'.DIRECTORY_SEPARATOR.$modelName.'Factory';
+        $path = DIRECTORY_SEPARATOR.'Fajarwz'.DIRECTORY_SEPARATOR.'LaravelReview'.DIRECTORY_SEPARATOR.'Tests'.DIRECTORY_SEPARATOR.'Database'.DIRECTORY_SEPARATOR.'Factories'.DIRECTORY_SEPARATOR.$modelName.'Factory';
 
         return $path::new();
     }

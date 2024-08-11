@@ -29,7 +29,8 @@
     },
     "scripts": {
         "test": "vendor/bin/phpunit",
-        "test-coverage": "vendor/bin/phpunit --coverage"
+        "test-coverage": "vendor/bin/phpunit --coverage",
+        "format": "vendor/bin/pint"
     },
     "config": {
         "sort-packages": true,
@@ -48,6 +49,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require-dev": {
+        "laravel/pint": "^1.17",
         "orchestra/testbench": "^9.2"
     }
 }

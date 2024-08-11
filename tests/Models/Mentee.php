@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Mentee extends Model
 {
+    use CanBeReviewed, CanReview;
     use HasPackageFactory;
-    use CanReview, CanBeReviewed;
 
     public $timestamps = false;
 
