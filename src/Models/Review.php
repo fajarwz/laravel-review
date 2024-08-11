@@ -53,10 +53,10 @@ class Review extends Model
      *
      * Sets the `approved_at` timestamp to indicate approval and updates the review summary.
      */
-    public function approve(): void
+    public function approve(): bool
     {
         if ($this->isApproved()) {
-            return;
+            return false;
         }
 
         DB::transaction(function () {
@@ -78,10 +78,10 @@ class Review extends Model
      *
      * Sets the `approved_at` timestamp to null and updates the review summary.
      */
-    public function unapprove(): void
+    public function unapprove(): bool
     {
         if (! $this->isApproved()) {
-            return;
+            return false;
         }
 
         DB::transaction(function () {
