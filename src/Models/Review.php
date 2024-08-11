@@ -64,7 +64,10 @@ class Review extends Model
             $this->approved_at = now();
             $this->save();
 
-            $this->reviewable->incrementReviewSummary($this->rating);
+            $params = [
+                'rating' => $this->rating,
+            ];
+            $this->reviewable->updateReviewSummary($params);
         });
     }
 
@@ -85,7 +88,11 @@ class Review extends Model
             $this->approved_at = null;
             $this->save();
 
-            $this->reviewable->decrementReviewSummary($this->rating);
+            $params = [
+                'rating' => $this->rating,
+                'decrement' => true,
+            ];
+            $this->reviewable->updateReviewSummary($params);
         });
     }
 

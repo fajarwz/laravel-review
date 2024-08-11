@@ -3,13 +3,13 @@
 namespace Fajarwz\LaravelReview\Tests;
 
 use Fajarwz\LaravelReview\LaravelReviewServiceProvider;
-use Fajarwz\LaravelReview\Tests\Models\Product;
-use Fajarwz\LaravelReview\Tests\Models\User;
+use Fajarwz\LaravelReview\Tests\Models\Mentor;
+use Fajarwz\LaravelReview\Tests\Models\Mentee;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
-    protected $product;
-    protected $user;
+    protected $mentor;
+    protected $mentee;
 
     protected function setUp(): void
     {
@@ -21,8 +21,8 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $this->loadMigrationsFrom(__DIR__ .DIRECTORY_SEPARATOR .'..'.DIRECTORY_SEPARATOR .'database'.DIRECTORY_SEPARATOR .'migrations');
         $this->artisan('migrate', ['--database' => 'testbench'])->run();
 
-        $this->product = Product::factory()->create();
-        $this->user = User::factory()->create();
+        $this->mentor = Mentor::factory()->create();
+        $this->mentee = Mentee::factory()->create();
     }
 
     protected function getPackageProviders($app)

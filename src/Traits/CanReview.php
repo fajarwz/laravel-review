@@ -6,16 +6,20 @@ use Fajarwz\LaravelReview\Exceptions\DuplicateReviewException;
 use Fajarwz\LaravelReview\Models\Review;
 use DB;
 use Fajarwz\LaravelReview\Exceptions\ReviewNotFoundException;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 trait CanReview
 {
     /**
-     * Relationship for models that this model currently reviewed.
-     *
-     * @param  null|\Illuminate\Database\Eloquent\Model  $model
-     * @return mixed
+     * Returns a collection of reviews given by this model.
+     * 
+     * This method allows filtering reviews by a specific model.
+     * 
+     * @param  \Illuminate\Database\Eloquent\Model|null  $model  The model to filter reviews by (optional)
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function givenReviews($model = null)
+    public function givenReviews(?Model $model = null): HasMany
     {
         $reviews = $this->hasMany(Review::class, 'reviewer_id')
             ->where('reviewer_type', get_class($this));
@@ -88,7 +92,7 @@ trait CanReview
             'content' => $newReview,
             'approved_at' => $isApproved ? now() : null,
         ];
-        return $this->saveReview($data);
+        return $this->saveReview($data, true);
     }
 
     /**
@@ -105,7 +109,11 @@ trait CanReview
 
         DB::transaction(function () use ($model) {
             $review = $this->givenReviews($model)->where('reviewable_id', $model->getKey())->first();
-            $model->decrementReviewSummary($review->rating);
+            $params = [
+                'rating' => $review->rating,
+                'decrement' => true,
+            ];
+            $model->updateReviewSummary($params);
             $review->delete();
         });
 
@@ -116,23 +124,33 @@ trait CanReview
      * Save a review and update the summary.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  bool                                 $isUpdate
      * @return \Fajarwz\LaravelReview\Models\Review
      */
-    public function saveReview(array $data): Review
+    public function saveReview(array $data, bool $isUpdate = false): Review
     {
-        return DB::transaction(function () use ($data) {
+        return DB::transaction(function () use ($data, $isUpdate) {
             $review = Review::where('reviewer_id', $data['reviewer_id'])
                 ->where('reviewer_type', $data['reviewer_type'])
                 ->where('reviewable_id', $data['reviewable_id'])
                 ->where('reviewable_type', $data['reviewable_type'])
                 ->firstOrNew();
+
+            $oldRating = 0.0;
+            if ($isUpdate) {
+                $oldRating = $review->rating;
+            }
     
             $review->fill($data);
             $review->save();
     
             if ($data['approved_at']) {
-                $reviewable = $review->reviewable;
-                $reviewable->incrementReviewSummary($data['rating']);
+                $params = [
+                    'rating' => $data['rating'],
+                    'oldRating' => $oldRating,
+                    'isUpdate' => $isUpdate,
+                ];
+                $review->reviewable->updateReviewSummary($params);
             }
     
             return $review;

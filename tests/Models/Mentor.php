@@ -7,7 +7,7 @@ use Fajarwz\LaravelReview\Traits\CanReview;
 use Fajarwz\LaravelReview\Traits\HasPackageFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Model
+class Mentor extends Model
 {
     use HasPackageFactory;
     use CanReview, CanBeReviewed;

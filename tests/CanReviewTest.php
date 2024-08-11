@@ -3,11 +3,11 @@
 namespace Fajarwz\LaravelReview\Tests;
 
 use Fajarwz\LaravelReview\Exceptions\DuplicateReviewException;
-use Fajarwz\LaravelReview\Models\Review;
 use Fajarwz\LaravelReview\Models\ReviewSummary;
-use Fajarwz\LaravelReview\Tests\Models\Product;
-use Fajarwz\LaravelReview\Tests\Models\User;
+use Fajarwz\LaravelReview\Tests\Models\Mentor;
+use Fajarwz\LaravelReview\Tests\Models\Mentee;
 use DB;
+use Fajarwz\LaravelReview\Exceptions\ReviewNotFoundException;
 
 class CanReviewTest extends TestCase
 {
@@ -15,22 +15,22 @@ class CanReviewTest extends TestCase
     {
         parent::setUp();
 
-        $otherUser = User::factory()->create();
+        $otherMentee = Mentee::factory()->create();
 
         $reviews = [
             [
-                'reviewer_id' => $this->user->id,
-                'reviewer_type' => get_class($this->user),
-                'reviewable_id' => $this->product->id,
-                'reviewable_type' => get_class($this->product),
+                'reviewer_id' => $this->mentee->id,
+                'reviewer_type' => get_class($this->mentee),
+                'reviewable_id' => $this->mentor->id,
+                'reviewable_type' => get_class($this->mentor),
                 'rating' => 4.5,
                 'approved_at' => now(),
             ],
             [
-                'reviewer_id' => $this->user->id,
-                'reviewer_type' => get_class($this->user),
-                'reviewable_id' => $otherUser->id,
-                'reviewable_type' => get_class($otherUser),
+                'reviewer_id' => $this->mentee->id,
+                'reviewer_type' => get_class($this->mentee),
+                'reviewable_id' => $otherMentee->id,
+                'reviewable_type' => get_class($otherMentee),
                 'rating' => 5,
                 'approved_at' => now(),
             ],
@@ -47,107 +47,129 @@ class CanReviewTest extends TestCase
         }
     }
 
-    public function test_a_reviewer_can_displays_its_given_reviews_to_all_models()
+    public function test_a_reviewer_can_display_its_given_reviews_to_all_models()
     {
-        $reviews = $this->user->givenReviews()->get();
+        $reviews = $this->mentee->givenReviews()->get();
         $this->assertCount(2, $reviews);
     }
 
-    public function test_a_reviewer_can_displays_its_given_reviews_to_a_specific_model()
+    public function test_a_reviewer_can_display_its_given_reviews_to_a_specific_model()
     {
-        $reviews = $this->user->givenReviews($this->product)->get();
+        $reviews = $this->mentee->givenReviews($this->mentor)->get();
         $this->assertCount(1, $reviews);
     }
 
-    public function test_should_return_true_if_a_reviewer_has_reviewed_the_given_model()
+    public function test_hasReviewed_returns_true_if_a_reviewer_has_reviewed_the_given_model()
     {
-        $this->assertTrue($this->user->hasReviewed($this->product));
+        $this->assertTrue($this->mentee->hasReviewed($this->mentor));
     }
 
-    public function test_should_return_false_if_a_reviewer_has_not_reviewed_the_given_model()
+    public function test_hasReviewed_returns_false_if_a_reviewer_has_not_reviewed_the_given_model()
     {
-        $this->assertFalse($this->user->hasReviewed($this->user));
+        $this->assertFalse($this->mentee->hasReviewed($this->mentee));
     }
 
     public function test_a_reviewer_can_review_the_given_model()
     {
-        $newProduct = Product::factory()->create();
+        $newMentor = Mentor::factory()->create();
 
-        $this->user->review($newProduct, 4, 'nice!!!');
+        $this->mentee->review($newMentor, 4, 'nice!!!');
 
-        $this->assertEquals($newProduct->id, $this->user->givenReviews(new Product)->orderByDesc('id')->first()->reviewable_id);
+        $this->assertEquals($newMentor->id, $this->mentee->givenReviews(new Mentor)->orderByDesc('id')->first()->reviewable_id);
     }
 
     public function test_it_can_review_the_same_model()
     {
-        $newUser = User::factory()->create();
+        $newMentee = Mentee::factory()->create();
 
-        $this->user->review($newUser, 4, 'nice!!!');
+        $this->mentee->review($newMentee, 4, 'nice!!!');
 
-        $this->assertEquals($newUser->id, $this->user->givenReviews(new User)->orderByDesc('id')->first()->reviewable_id);
+        $this->assertEquals($newMentee->id, $this->mentee->givenReviews(new Mentee)->orderByDesc('id')->first()->reviewable_id);
     }
 
     public function test_a_reviewer_can_not_review_a_model_that_has_already_been_reviewed_using_review_function()
     {
         $this->expectException(DuplicateReviewException::class);
 
-        $newUser = User::factory()->create();
+        $newMentee = Mentee::factory()->create();
 
-        $this->user->review($newUser, 4, 'nice!!!');
-        $this->user->review($newUser, 5, 'nice!!!');
+        $this->mentee->review($newMentee, 4, 'nice!!!');
+        $this->mentee->review($newMentee, 5, 'nice!!!');
     }
 
     public function test_a_reviewer_can_update_a_review()
     {
-        $product = $this->user->givenReviews(new Product)->first()->reviewable;
+        $mentor = $this->mentee->givenReviews(new Mentor)->first()->reviewable;
 
         $newRating = 3.5;
-        $this->user->updateReview($product, $newRating, 'nice!!!');
+        $this->mentee->updateReview($mentor, $newRating, 'nice!!!');
 
-        $this->assertEquals($this->user->givenReviews(new Product)->whereReviewableId($product->id)->first()->rating, $newRating);
+        $this->assertEquals($this->mentee->givenReviews(new Mentor)->whereReviewableId($mentor->id)->first()->rating, $newRating);
     }
     
     public function test_a_review_summary_for_the_reviewable_model_updated_after_update_review()
     {
         $reviewSummary = ReviewSummary::where([
-            'reviewable_id' => $this->product->id,
-            'reviewable_type' => get_class($this->product),
+            'reviewable_id' => $this->mentor->id,
+            'reviewable_type' => get_class($this->mentor),
         ])->first();
 
-        $this->user->updateReview($this->product, 4, 'nice!!!');
+        $this->mentee->updateReview($this->mentor, 4, 'nice!!!');
 
-        $this->assertTrue($reviewSummary->average_rating !== $this->product->reviewSummary->average_rating);
+        $this->assertTrue($reviewSummary->average_rating !== $this->mentor->reviewSummary->average_rating);
     }
 
     public function test_a_reviewer_can_unreview_a_review()
     {
-        $newProduct = Product::factory()->create();
+        $newMentor = Mentor::factory()->create();
 
-        $this->user->review($newProduct, 4);
-        $this->user->unreview($newProduct);
+        $this->mentee->review($newMentor, 4);
+        $this->mentee->unreview($newMentor);
 
-        $this->assertFalse($this->user->givenReviews(new Product)->whereReviewableId($newProduct->id)->exists());
+        $this->assertFalse($this->mentee->givenReviews(new Mentor)->whereReviewableId($newMentor->id)->exists());
     }
 
-    public function test_a_review_summary_display_correct_summary()
+    public function test_a_reviewer_can_not_unreview_a_review_that_does_not_exists()
+    {
+        $this->expectException(ReviewNotFoundException::class);
+
+        $newMentee = Mentee::factory()->create();
+
+        $this->mentee->unreview($newMentee);
+    }
+
+    public function test_a_review_summary_for_the_reviewable_model_updated_after_an_unreview()
+    {
+        $reviewSummary = ReviewSummary::where([
+            'reviewable_id' => $this->mentor->id,
+            'reviewable_type' => get_class($this->mentor),
+        ])->first();
+
+        $this->mentee->unreview($this->mentor);
+
+        $this->assertTrue($reviewSummary->average_rating !== $this->mentor->reviewSummary->average_rating);
+    }
+
+    public function test_a_review_summary_should_display_correct_summary()
     {
         DB::table('reviews')->truncate();
         DB::table('review_summaries')->truncate();
 
-        $userNumber = 100;
-        $users = User::factory($userNumber)->create();
-        $product = Product::factory()->create();
-        $ratings = $this->getRandomRatings($userNumber, 1, 10);
+        $menteeNumber = 100;
+        $mentees = Mentee::factory($menteeNumber)->create();
+        $mentor = Mentor::factory()->create();
+        $ratings = $this->getRandomRatings($menteeNumber, 1, 10);
 
-        for ($i = 0; $i < $userNumber; $i++) {
-            $users[$i]->review($product, $ratings[$i]);
+        for ($i = 0; $i < $menteeNumber; $i++) {
+            $mentees[$i]->review($mentor, $ratings[$i]);
         }
 
         $averageRating = round(array_sum($ratings) / count($ratings), 2);
-        $productAverageRating = round($product->reviewSummary->average_rating, 2);
+        $mentorAverageRating = round($mentor->reviewSummary->average_rating, 2);
 
-        $this->assertEquals($averageRating, $productAverageRating);
-        $this->assertEquals($product->reviewSummary->review_count, $userNumber);
+        // Compare with a delta to account for minor rounding differences
+        $this->assertEqualsWithDelta($averageRating, $mentorAverageRating, 0.1);
+        $this->assertEquals($mentor->reviewSummary->review_count, $menteeNumber);
     }
 
     private function getRandomRatings($total, $min, $max)
