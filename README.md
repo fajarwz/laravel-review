@@ -148,7 +148,7 @@ if ($mentee->hasGivenReview($mentor)) {
 }
 ```
 
-### Checking if a reviewer model has received a review from the specified model
+### Checking if a revieweable model has received a review from the specified model
 
 ```php
 if ($mentor->hasReceivedReview($mentee)) {
