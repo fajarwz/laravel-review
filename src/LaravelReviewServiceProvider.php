@@ -15,7 +15,7 @@ class LaravelReviewServiceProvider extends ServiceProvider
          * Publish the database migration files
          */
         $this->publishes([
-            __DIR__.'\\..\\database\\migrations' => base_path('database/migrations'),
+            __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'database'.DIRECTORY_SEPARATOR.'migrations' => base_path('database/migrations'),
         ], 'laravel-review_migrations');
     }
 }
