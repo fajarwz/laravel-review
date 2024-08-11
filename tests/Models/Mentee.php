@@ -11,7 +11,7 @@ class Mentee extends Model
 {
     use CanBeReviewed, CanReview;
     use HasFactory;
-    
+
     public $timestamps = false;
 
     protected $guarded = [];
