@@ -2,6 +2,8 @@
 
 namespace Fajarwz\LaravelReview;
 
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 
 class LaravelReviewServiceProvider extends ServiceProvider
@@ -11,11 +13,27 @@ class LaravelReviewServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        /**
-         * Publish the database migration files
-         */
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
+
         $this->publishes([
-            __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'database'.DIRECTORY_SEPARATOR.'migrations' => base_path('database/migrations'),
-        ], 'laravel-review_migrations');
+            __DIR__.'/../database/migrations/create_reviews_table.php.stub' => $this->getMigrationFileName('create_reviews_table.php'),
+        ], 'migrations');
+    }
+
+    /**
+     * Returns existing migration file if found, else uses the current timestamp.
+     */
+    protected function getMigrationFileName(string $migrationFileName): string
+    {
+        $timestamp = date('Y_m_d_His');
+
+        $filesystem = $this->app->make(Filesystem::class);
+
+        return Collection::make([$this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR])
+            ->flatMap(fn ($path) => $filesystem->glob($path.'*_'.$migrationFileName))
+            ->push($this->app->databasePath()."/migrations/{$timestamp}_{$migrationFileName}")
+            ->first();
     }
 }

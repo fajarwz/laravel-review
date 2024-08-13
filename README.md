@@ -18,7 +18,7 @@ composer require fajarwz/laravel-review
 You can publish and run the migrations with:
 
 ```bash
-php artisan vendor:publish --tag="laravel-review_migrations"
+php artisan vendor:publish --provider="Fajarwz\LaravelReview\LaravelReviewServiceProvider"
 php artisan migrate
 ```
 
@@ -64,13 +64,13 @@ $mentee = Mentee::find(1);
 $mentor = Mentor::find(1);
 
 // Create an approved review
-$mentee->review($mentor, 4.5, 'Great mentor!');
+$mentee->review($mentor, 4.5);
 
 // Create an unapproved review
 $mentee->review($mentor, 3.0, 'Needs improvement', false);
 ```
 
-The `review()` method requires the reviewable model, rating, and review content. Optionally, set the `$isApproved` parameter to `false` to create an unapproved review.
+The `review()` method takes a reviewable model and a rating. Optionally, set the review content to add a review and set the `$isApproved` parameter to `false` to create an unapproved review.
 
 Only approved reviews are calculated in the `review_summaries` table. Updating an unapproved review will not affect the summary.
 
@@ -248,14 +248,7 @@ $reviewable = $reviewSummary->reviewable;
 ## Testing
 
 ```bash
-# Use PHPStan to perform static analysis
-composer analyse
-
-# Execute PHPUnit tests
 composer test
-
-# Use Pint to format your code
-composer format
 ```
 
 ## Changelog

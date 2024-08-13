@@ -16,14 +16,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     {
         parent::setUp();
 
-        $this->loadMigrationsFrom(__DIR__.DIRECTORY_SEPARATOR.'Database'.DIRECTORY_SEPARATOR.'Migrations');
-        $this->artisan('migrate', ['--database' => 'testbench'])->run();
-
-        $this->loadMigrationsFrom(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'database'.DIRECTORY_SEPARATOR.'migrations');
-        $this->artisan('migrate', ['--database' => 'testbench'])->run();
-
-        $this->mentor = Mentor::factory()->create();
-        $this->mentee = Mentee::factory()->create();
+        $this->setUpDatabase();
     }
 
     protected function getPackageProviders($app)
@@ -41,5 +34,17 @@ class TestCase extends \Orchestra\Testbench\TestCase
             'database' => ':memory:',
             'prefix' => '',
         ]);
+    }
+
+    private function setUpDatabase()
+    {
+        $this->loadMigrationsFrom(__DIR__.'/Database/Migrations');
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+
+        $migration = require __DIR__.'/../database/migrations/create_reviews_table.php.stub';
+        $migration->up();
+
+        $this->mentor = Mentor::factory()->create();
+        $this->mentee = Mentee::factory()->create();
     }
 }
