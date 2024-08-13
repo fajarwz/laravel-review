@@ -86,6 +86,8 @@ To update an existing review:
 $mentee->updateReview($mentor, 5, 'Mentor is even better now!');
 ```
 
+The `updateReview()` method accepts three parameters: a reviewable model, a rating, and an optional review text.
+
 ### Unreviewing a model
 
 To cancel an existing review:

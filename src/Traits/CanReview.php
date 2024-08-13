@@ -72,7 +72,7 @@ trait CanReview
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      */
-    public function updateReview($model, float $newRating, ?string $newReview = null, bool $isApproved = true): Review
+    public function updateReview($model, float $newRating, ?string $newReview = null): Review
     {
         $data = [
             'reviewer_id' => $this->id,
@@ -81,7 +81,6 @@ trait CanReview
             'reviewable_type' => $model->getMorphClass(),
             'rating' => $newRating,
             'content' => $newReview,
-            'approved_at' => $isApproved ? now() : null,
         ];
 
         return $this->saveReview($data, true);
@@ -125,24 +124,39 @@ trait CanReview
                 ->where('reviewable_type', $data['reviewable_type'])
                 ->firstOrNew();
 
-            $oldRating = 0.0;
-            if ($isUpdate) {
-                $oldRating = $review->rating;
-            }
+            $oldRating = $this->getOldRating($review, $isUpdate);
 
             $review->fill($data);
             $review->save();
 
-            if ($data['approved_at']) {
-                $params = [
-                    'rating' => $data['rating'],
-                    'oldRating' => $oldRating,
-                    'isUpdate' => $isUpdate,
-                ];
-                $review->reviewable->updateReviewSummary($params);
-            }
+            $this->handleUpdateReviewSummary($review, $data, $isUpdate, $oldRating);
 
             return $review;
         });
+    }
+
+    protected function getOldRating($review, $isUpdate)
+    {
+        $oldRating = 0.0;
+        if ($isUpdate) {
+            $oldRating = $review->rating;
+        }
+
+        return $oldRating;
+    }
+
+    protected function handleUpdateReviewSummary($review, $data, $isUpdate, $oldRating)
+    {
+        $isUnapprove = array_key_exists('approved_at', $data) && is_null($data['approved_at']);
+        if ($isUnapprove) {
+            return;
+        }
+
+        $params = [
+            'rating' => $data['rating'],
+            'oldRating' => $oldRating,
+            'isUpdate' => $isUpdate,
+        ];
+        $review->reviewable->updateReviewSummary($params);
     }
 }
