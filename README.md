@@ -142,6 +142,23 @@ This query will eager load the reviewer information for each received review.
 
 **Note:** Consider using appropriate eager loading strategies based on your application's needs to optimize query performance.
 
+#### Get a review received from a specified reviewer
+
+To retrieve a review that a reviewer has given to reviewable:
+
+```php
+$review = $mentor->getReceivedReview($mentee);
+```
+
+This method returns a single `Review` instance or `null` if no review exists.
+
+To include unapproved reviews in the search, pass `true` as the second parameter:
+
+```php
+$includeUnapproved = true;
+$review = $mentor->getReceivedReview($mentee, $includeUnapproved);
+```
+
 #### Get all given reviews
 
 To get all reviews given by a model:
@@ -157,6 +174,59 @@ Mentee::with('givenReviews.reviewable')->paginate();
 ```
 
 This will eager load the reviewable model for each review given by the model.
+
+#### Get a review given from a specified reviewable model
+
+To retrieve a given review that a reviewable has received from reviewer:
+
+```php
+$review = $mentee->getGivenReview($mentor);
+```
+
+This method returns a single `Review` instance or `null` if no review exists.
+
+To include unapproved reviews in the search, pass `true` as the second parameter:
+
+```php
+$includeUnapproved = true;
+$review = $mentor->getGivenReview($mentee, $includeUnapproved);
+```
+
+### Checking for Reviews
+
+#### Check if a reviewable model has received a review from a specific reviewer
+
+```php
+if ($mentor->hasReceivedReview($mentee)) {
+    // The mentor has received a review from the mentee
+}
+```
+
+To include unapproved reviews in the check, pass `true` as the second parameter:
+
+```php
+$includeUnapproved = true;
+if ($mentor->hasReceivedReview($mentee, $includeUnapproved)) {
+    // The mentor has received a review from the mentee
+}
+```
+
+#### Check if the current model has given a review to the specified model
+
+```php
+if ($mentee->hasGivenReview($mentor)) {
+    // The mentee has given a review to the mentor
+}
+```
+
+To include unapproved reviews in the check, pass `true` as the second parameter:
+
+```php
+$includeUnapproved = true;
+if ($mentee->hasGivenReview($mentor, $includeUnapproved)) {
+    // The mentee has given a review to the mentor
+}
+```
 
 ### Review Model
 

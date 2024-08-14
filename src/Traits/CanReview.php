@@ -32,15 +32,36 @@ trait CanReview
 
     /**
      * Check if the current model has given a review for the specified model.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
      */
-    public function hasGivenReview($model): bool
+    public function hasGivenReview(Model $model, bool $includeUnapproved = false): bool
     {
-        return $this->givenReviews()
+        $query = $this->givenReviews()
             ->where('reviewable_type', get_class($model))
-            ->where('reviewable_id', $model->getKey())
-            ->exists();
+            ->where('reviewable_id', $model->getKey());
+
+        if ($includeUnapproved) {
+            $query->withUnapproved();
+        }
+
+        return $query->exists();
+    }
+
+    /**
+     * Get the current model given review for the specified model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|null  $model
+     */
+    public function getGivenReview(Model $model, bool $includeUnapproved = false): ?Review
+    {
+        $query = $this->givenReviews()
+            ->where('reviewable_type', get_class($model))
+            ->where('reviewable_id', $model->getKey());
+
+        if ($includeUnapproved) {
+            $query->withUnapproved();
+        }
+
+        return $query->first();
     }
 
     /**
@@ -50,7 +71,7 @@ trait CanReview
      */
     public function review($model, float $rating, ?string $reviewContent = null, bool $isApproved = true): Review
     {
-        if ($this->hasGivenReview($model)) {
+        if ($this->hasGivenReview($model, true)) {
             throw new DuplicateReviewException;
         }
 
@@ -93,7 +114,7 @@ trait CanReview
      */
     public function unreview($model): bool
     {
-        if (! $this->hasGivenReview($model)) {
+        if (! $this->hasGivenReview($model, true)) {
             throw new ReviewNotFoundException;
         }
 
