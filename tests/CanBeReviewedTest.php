@@ -3,6 +3,7 @@
 namespace Fajarwz\LaravelReview\Tests;
 
 use DB;
+use Fajarwz\LaravelReview\Models\Review;
 use Fajarwz\LaravelReview\Tests\Models\Mentee;
 use Fajarwz\LaravelReview\Tests\Models\Mentor;
 
@@ -66,6 +67,85 @@ class CanBeReviewedTest extends TestCase
     {
         $otherMentee = Mentee::factory()->create();
         $this->assertFalse($this->mentor->hasReceivedReview($otherMentee));
+    }
+
+    public function test_hasReceivedReview_returns_true_with_includeUnapproved_true_if_a_reviewable_has_unapproved_review_by_the_given_model()
+    {
+        $otherMentee = Mentee::factory()->create();
+
+        DB::table('reviews')->insert([
+            'reviewer_id' => $otherMentee->id,
+            'reviewer_type' => get_class($otherMentee),
+            'reviewable_id' => $this->mentor->id,
+            'reviewable_type' => get_class($this->mentor),
+            'rating' => 3,
+            'approved_at' => null,
+        ]);
+
+        $this->assertTrue($this->mentor->hasReceivedReview($otherMentee, true));
+    }
+
+    public function test_hasReceivedReview_returns_false_with_includeUnapproved_false_if_a_reviewable_has_unapproved_review_by_the_given_model()
+    {
+        $otherMentee = Mentee::factory()->create();
+
+        DB::table('reviews')->insert([
+            'reviewer_id' => $otherMentee->id,
+            'reviewer_type' => get_class($otherMentee),
+            'reviewable_id' => $this->mentor->id,
+            'reviewable_type' => get_class($this->mentor),
+            'rating' => 3,
+            'approved_at' => null,
+        ]);
+
+        $this->assertFalse($this->mentor->hasReceivedReview($otherMentee));
+    }
+
+    public function test_getReceivedReview_retrieves_only_approved_review_by_default()
+    {
+        $review = $this->mentor->getReceivedReview($this->mentee);
+
+        $this->assertInstanceOf(Review::class, $review);
+        $this->assertEquals($this->mentee->id, $review->reviewer_id);
+        $this->assertEquals(4.5, $review->rating);
+    }
+
+    public function test_getReceivedReview_returns_null_for_unapproved_review_by_default()
+    {
+        $newMentee = Mentor::factory()->create();
+
+        DB::table('reviews')->insert([
+            'reviewer_id' => $newMentee->id,
+            'reviewer_type' => get_class($newMentee),
+            'reviewable_id' => $this->mentor->id,
+            'reviewable_type' => get_class($this->mentor),
+            'rating' => 3,
+            'approved_at' => null,
+        ]);
+
+        $review = $this->mentor->getReceivedReview($newMentee);
+
+        $this->assertNull($review);
+    }
+
+    public function test_getReceivedReview_can_retrieve_unapproved_review_when_includeUnapproved_is_true()
+    {
+        $newMentee = Mentee::factory()->create();
+
+        DB::table('reviews')->insert([
+            'reviewer_id' => $newMentee->id,
+            'reviewer_type' => get_class($newMentee),
+            'reviewable_id' => $this->mentor->id,
+            'reviewable_type' => get_class($this->mentor),
+            'rating' => 3,
+            'approved_at' => null,
+        ]);
+
+        $review = $this->mentor->getReceivedReview($newMentee, true);
+
+        $this->assertInstanceOf(Review::class, $review);
+        $this->assertEquals($newMentee->id, $review->reviewer_id);
+        $this->assertEquals(3, $review->rating);
     }
 
     public function test_a_reviewable_can_display_its_review_summary()

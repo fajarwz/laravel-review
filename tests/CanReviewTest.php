@@ -5,6 +5,7 @@ namespace Fajarwz\LaravelReview\Tests;
 use DB;
 use Fajarwz\LaravelReview\Exceptions\DuplicateReviewException;
 use Fajarwz\LaravelReview\Exceptions\ReviewNotFoundException;
+use Fajarwz\LaravelReview\Models\Review;
 use Fajarwz\LaravelReview\Models\ReviewSummary;
 use Fajarwz\LaravelReview\Tests\Models\Mentee;
 use Fajarwz\LaravelReview\Tests\Models\Mentor;
@@ -68,6 +69,85 @@ class CanReviewTest extends TestCase
     {
         $otherMentor = Mentor::factory()->create();
         $this->assertFalse($this->mentee->hasGivenReview($otherMentor));
+    }
+
+    public function test_hasGivenReview_returns_true_with_includeUnapproved_true_if_a_reviewer_has_unapproved_review_for_the_given_model()
+    {
+        $otherMentor = Mentor::factory()->create();
+
+        DB::table('reviews')->insert([
+            'reviewer_id' => $this->mentee->id,
+            'reviewer_type' => get_class($this->mentee),
+            'reviewable_id' => $otherMentor->id,
+            'reviewable_type' => get_class($otherMentor),
+            'rating' => 3,
+            'approved_at' => null,
+        ]);
+
+        $this->assertTrue($this->mentee->hasGivenReview($otherMentor, true));
+    }
+
+    public function test_hasGivenReview_returns_false_with_includeUnapproved_false_if_a_reviewer_has_unapproved_review_for_the_given_model()
+    {
+        $otherMentor = Mentor::factory()->create();
+
+        DB::table('reviews')->insert([
+            'reviewer_id' => $this->mentee->id,
+            'reviewer_type' => get_class($this->mentee),
+            'reviewable_id' => $this->mentor->id,
+            'reviewable_type' => get_class($this->mentor),
+            'rating' => 3,
+            'approved_at' => null,
+        ]);
+
+        $this->assertFalse($this->mentee->hasGivenReview($otherMentor));
+    }
+
+    public function test_getGivenReview_retrieves_only_approved_review_by_default()
+    {
+        $review = $this->mentee->getGivenReview($this->mentor);
+
+        $this->assertInstanceOf(Review::class, $review);
+        $this->assertEquals($this->mentor->id, $review->reviewable_id);
+        $this->assertEquals(4.5, $review->rating);
+    }
+
+    public function test_getGivenReview_returns_null_for_unapproved_review_by_default()
+    {
+        $newMentor = Mentor::factory()->create();
+
+        DB::table('reviews')->insert([
+            'reviewer_id' => $this->mentee->id,
+            'reviewer_type' => get_class($this->mentee),
+            'reviewable_id' => $newMentor->id,
+            'reviewable_type' => get_class($newMentor),
+            'rating' => 3,
+            'approved_at' => null,
+        ]);
+
+        $review = $this->mentee->getGivenReview($newMentor);
+
+        $this->assertNull($review);
+    }
+
+    public function test_getGivenReview_can_retrieve_unapproved_review_when_includeUnapproved_is_true()
+    {
+        $newMentor = Mentor::factory()->create();
+
+        DB::table('reviews')->insert([
+            'reviewer_id' => $this->mentee->id,
+            'reviewer_type' => get_class($this->mentee),
+            'reviewable_id' => $newMentor->id,
+            'reviewable_type' => get_class($newMentor),
+            'rating' => 3,
+            'approved_at' => null,
+        ]);
+
+        $review = $this->mentee->getGivenReview($newMentor, true);
+
+        $this->assertInstanceOf(Review::class, $review);
+        $this->assertEquals($newMentor->id, $review->reviewable_id);
+        $this->assertEquals(3, $review->rating);
     }
 
     public function test_a_reviewer_can_review_the_given_model()

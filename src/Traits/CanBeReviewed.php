@@ -32,12 +32,35 @@ trait CanBeReviewed
     /**
      * Check if the current model has received a review from the specified model.
      */
-    public function hasReceivedReview(Model $model): bool
+    public function hasReceivedReview(Model $model, bool $includeUnapproved = false): bool
     {
-        return $this->receivedReviews()
+        $query = $this->receivedReviews()
             ->where('reviewer_type', get_class($model))
-            ->where('reviewer_id', $model->getKey())
-            ->exists();
+            ->where('reviewer_id', $model->getKey());
+
+        if ($includeUnapproved) {
+            $query->withUnapproved();
+        }
+
+        return $query->exists();
+    }
+
+    /**
+     * Get the current model received review of the specified model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|null  $model
+     */
+    public function getReceivedReview(Model $model, bool $includeUnapproved = false): ?Review
+    {
+        $query = $this->receivedReviews()
+            ->where('reviewer_type', get_class($model))
+            ->where('reviewer_id', $model->getKey());
+
+        if ($includeUnapproved) {
+            $query->withUnapproved();
+        }
+
+        return $query->first();
     }
 
     /**
