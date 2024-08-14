@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-review` will be documented in this file.
 
+## 1.1.0 - 2024-08-14
+
+- add a single review
+- fix the approval system
+- update docs
+
+**Full Changelog**: https://github.com/fajarwz/laravel-review/compare/1.0.0...1.1.0
+
 ## 1.0.0 - 2024-08-11
 
 ### First Release
