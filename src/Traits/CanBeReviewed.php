@@ -64,9 +64,6 @@ trait CanBeReviewed
 
     /**
      * Get the current model latest received reviews of the specified model.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model|null  $model
-     * @param  bool                                      $includeUnapproved
      */
     public function getLatestReceivedReviews(?Model $model = null, bool $includeUnapproved = false): Collection
     {
