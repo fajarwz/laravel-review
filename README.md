@@ -126,6 +126,18 @@ By default, only approved reviews are retrieved:
 $mentor->receivedReviews()->get();
 ```
 
+To get the latest received reviews:
+
+```php
+$mentor->latestReceivedReviews()->paginate();
+```
+
+To get the top-rated received reviews:
+
+```php
+$mentor->topRatedReceivedReviews()->paginate();
+```
+
 To include both approved and unapproved reviews:
 
 ```php
