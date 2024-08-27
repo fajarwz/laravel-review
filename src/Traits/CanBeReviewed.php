@@ -34,8 +34,7 @@ trait CanBeReviewed
      */
     public function hasReceivedReview(Model $model, bool $includeUnapproved = false): bool
     {
-        $query = $this->receivedReviews()
-            ->where('reviewer_type', get_class($model))
+        $query = $this->receivedReviews($model)
             ->where('reviewer_id', $model->getKey());
 
         if ($includeUnapproved) {
@@ -52,8 +51,7 @@ trait CanBeReviewed
      */
     public function getReceivedReview(Model $model, bool $includeUnapproved = false): ?Review
     {
-        $query = $this->receivedReviews()
-            ->where('reviewer_type', get_class($model))
+        $query = $this->receivedReviews($model)
             ->where('reviewer_id', $model->getKey());
 
         if ($includeUnapproved) {
