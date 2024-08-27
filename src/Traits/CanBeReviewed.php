@@ -4,7 +4,6 @@ namespace Fajarwz\LaravelReview\Traits;
 
 use Fajarwz\LaravelReview\Models\Review;
 use Fajarwz\LaravelReview\Models\ReviewSummary;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -63,9 +62,9 @@ trait CanBeReviewed
     }
 
     /**
-     * Get the current model latest received reviews of the specified model.
+     * Query the current model latest received reviews of the specified model.
      */
-    public function getLatestReceivedReviews(?Model $model = null, bool $includeUnapproved = false): Collection
+    public function latestReceivedReviews(?Model $model = null, bool $includeUnapproved = false): HasMany
     {
         $query = $this->receivedReviews($model);
 
@@ -73,7 +72,7 @@ trait CanBeReviewed
             $query->withUnapproved();
         }
 
-        return $query->orderByDesc('created_at')->get();
+        return $query->orderByDesc('created_at');
     }
 
     /**
