@@ -64,15 +64,17 @@ trait CanBeReviewed
     /**
      * Query the current model latest received reviews of the specified model.
      */
-    public function latestReceivedReviews(?Model $model = null, bool $includeUnapproved = false): HasMany
+    public function latestReceivedReviews(?Model $model = null): HasMany
     {
-        $query = $this->receivedReviews($model);
+        return $this->receivedReviews($model)->orderByDesc('created_at');
+    }
 
-        if ($includeUnapproved) {
-            $query->withUnapproved();
-        }
-
-        return $query->orderByDesc('created_at');
+    /**
+     * Query the current model top rated received reviews of the specified model.
+     */
+    public function topRatedReceivedReviews(?Model $model = null): HasMany
+    {
+        return $this->receivedReviews($model)->orderByDesc('rating');
     }
 
     /**

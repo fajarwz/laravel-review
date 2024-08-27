@@ -148,7 +148,7 @@ class CanBeReviewedTest extends TestCase
         $this->assertEquals(3, $review->rating);
     }
 
-    public function test_latestReceivedReviews_retrieves_latest_approved_reviews_by_default()
+    public function test_latestReceivedReviews_retrieves_latest_approved_reviews()
     {
         $newMentee = Mentor::factory()->create();
 
@@ -160,28 +160,16 @@ class CanBeReviewedTest extends TestCase
         $this->assertEquals($reviews->first()->id, $newReview->id);
     }
 
-    public function test_latestReceivedReviews_not_returning_unapproved_reviews_by_default()
+    public function test_topRatedReceivedReviews_retrieves_top_rated_approved_reviews()
     {
         $newMentee = Mentor::factory()->create();
 
-        $newReview = $newMentee->review($this->mentor, 4, 'nice!!!', isApproved: false);
+        $newMentee->review($this->mentor, 2);
 
-        $reviews = $this->mentor->latestReceivedReviews()->get();
-
-        $this->assertCount(2, $reviews);
-        $this->assertNotEquals($reviews->first()->id, $newReview->id);
-    }
-
-    public function test_latestReceivedReviews_can_retrieves_unapproved_reviews_when_includeUnapproved_is_true()
-    {
-        $newMentee = Mentor::factory()->create();
-
-        $newReview = $newMentee->review($this->mentor, 4, 'nice!!!', isApproved: false);
-
-        $reviews = $this->mentor->latestReceivedReviews(includeUnapproved: true)->get();
+        $reviews = $this->mentor->topRatedReceivedReviews()->get();
 
         $this->assertCount(3, $reviews);
-        $this->assertEquals($reviews->first()->id, $newReview->id);
+        $this->assertEquals($reviews->first()->rating, 5);
     }
 
     public function test_a_reviewable_can_display_its_review_summary()
